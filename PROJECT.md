@@ -74,7 +74,7 @@ Elementy, które nie były częścią MVP, mogą być realizowane w kolejnych et
 
 ## Aktualny etap rozwoju
 
-Celem obecnego etapu jest poprawa ergonomii UI oraz rozszerzenie istniejących generatorów o parametry i generowanie wielu rekordów.
+Celem obecnego etapu jest dalszy rozwój generatorów danych testowych przy zachowaniu istniejącego układu UI oraz wspólnych mechanizmów generowania wielu rekordów i prezentacji wyników.
 
 ### Nawigacja i układ UI
 
@@ -95,7 +95,7 @@ Nie używać pojedynczej listy wyboru generatora jako głównego mechanizmu nawi
 
 ### Wspólne zachowanie generatorów
 
-W bieżącym etapie każdy istniejący generator powinien obsługiwać:
+Każdy generator objęty bieżącym zakresem powinien obsługiwać:
 
 - liczbę generowanych rekordów
 - wartość domyślną: 1
@@ -110,7 +110,7 @@ Panel wyników powinien umożliwiać:
 - kopiowanie wszystkich wartości
 - wyświetlenie liczby wygenerowanych rekordów
 
-Eksport do CSV pozostaje osobnym etapem.
+Eksport do CSV i JSON pozostaje osobnym etapem.
 
 ### PESEL
 
@@ -146,6 +146,64 @@ Generowane numery muszą:
 Domyślnie:
 
 - generator PESEL powinien być pierwszym widocznym generatorem
+
+### NRB / IBAN
+
+W bieżącym etapie należy dodać generator polskiego numeru rachunku bankowego.
+
+Generator powinien być dostępny w zakładce:
+
+- Finanse
+
+Panel generatora powinien umożliwiać wybór formatu:
+
+- NRB
+- IBAN
+
+#### NRB
+
+Generowany NRB powinien:
+
+- mieć dokładnie 26 cyfr
+- zawierać poprawne cyfry kontrolne
+- przechodzić walidację zgodną z algorytmem modulo 97
+- być generowany jako syntetyczny numer testowy
+
+#### IBAN
+
+Generowany IBAN powinien:
+
+- używać kodu kraju `PL`
+- rozpoczynać się od prefiksu `PL`
+- zawierać poprawny polski numer rachunku
+- przechodzić standardową walidację IBAN modulo 97
+- być prezentowany bez spacji jako wartość bazowa
+
+#### Wspólne wymagania NRB / IBAN
+
+Generator powinien obsługiwać:
+
+- liczbę rekordów od 1 do 1000
+- wartość domyślną: 1
+- wspólny mechanizm walidacji liczby rekordów
+- wspólny panel wyników
+- kopiowanie pojedynczej wartości
+- kopiowanie wszystkich wartości
+
+Logika generowania i walidacji NRB / IBAN powinna być niezależna od UI.
+
+Jeżeli implementowany jest walidator, powinien być możliwy do użycia niezależnie od komponentów React.
+
+Generowane numery są wyłącznie syntetycznymi danymi testowymi.
+
+Nie należy:
+
+- deklarować, że wygenerowany numer należy do rzeczywistego klienta
+- deklarować, że numer odpowiada rzeczywistemu aktywnemu rachunkowi
+- dodawać rzeczywistych danych klientów
+- dodawać SWIFT / BIC
+- dodawać danych kart płatniczych
+- implementować wyszukiwania banku na podstawie numeru rachunku w tym etapie
 
 ### UUID
 
@@ -187,5 +245,6 @@ Przykład:
 src/
   generators/
     pesel.ts
+    bankAccount.ts
     uuid.ts
     text.ts
