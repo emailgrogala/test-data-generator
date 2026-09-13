@@ -29,6 +29,7 @@ import { RecordCountField } from './components/RecordCountField'
 import { ResultsPanel } from './components/ResultsPanel'
 import { generateBankAccount } from './generators/bankAccount'
 import type { BankAccountFormat } from './generators/bankAccount'
+import { generateNip } from './generators/nip'
 import {
   generatePesel,
   getPeselOptionsError,
@@ -53,7 +54,7 @@ import { generateUuid } from './generators/uuid'
 import './App.css'
 
 type Category = 'personal' | 'finance' | 'text' | 'technical'
-type GeneratorPanel = 'pesel' | 'bank-account' | 'text' | 'uuid'
+type GeneratorPanel = 'pesel' | 'nip' | 'bank-account' | 'text' | 'uuid'
 
 const defaultPanelByCategory: Record<Category, GeneratorPanel | false> = {
   personal: 'pesel',
@@ -87,6 +88,7 @@ function App() {
   const [expandedPanel, setExpandedPanel] =
     useState<GeneratorPanel | false>('pesel')
   const [peselCount, setPeselCount] = useState('1')
+  const [nipCount, setNipCount] = useState('1')
   const [bankAccountCount, setBankAccountCount] = useState('1')
   const [uuidCount, setUuidCount] = useState('1')
   const [textCount, setTextCount] = useState('1')
@@ -102,6 +104,7 @@ function App() {
   const [copyStatus, setCopyStatus] = useState<'success' | 'error' | null>(null)
 
   const parsedPeselCount = parseRecordCount(peselCount)
+  const parsedNipCount = parseRecordCount(nipCount)
   const parsedBankAccountCount = parseRecordCount(bankAccountCount)
   const parsedUuidCount = parseRecordCount(uuidCount)
   const parsedTextCount = parseRecordCount(textCount)
@@ -193,17 +196,18 @@ function App() {
                 hidden={category !== 'personal'}
               >
                 {category === 'personal' && (
-                  <Accordion
-                    expanded={expandedPanel === 'pesel'}
-                    onChange={togglePanel('pesel')}
-                    disableGutters
-                    elevation={0}
-                  >
-                    <AccordionSummary
-                      id="pesel-accordion-header"
-                      aria-controls="pesel-accordion-content"
-                      expandIcon={<ExpandMoreRoundedIcon />}
+                  <Stack spacing={2}>
+                    <Accordion
+                      expanded={expandedPanel === 'pesel'}
+                      onChange={togglePanel('pesel')}
+                      disableGutters
+                      elevation={0}
                     >
+                      <AccordionSummary
+                        id="pesel-accordion-header"
+                        aria-controls="pesel-accordion-content"
+                        expandIcon={<ExpandMoreRoundedIcon />}
+                      >
                       <Box>
                         <Typography variant="h6">PESEL</Typography>
                         <Typography variant="body2" color="text.secondary">
@@ -300,7 +304,51 @@ function App() {
                         </Button>
                       </Stack>
                     </AccordionDetails>
-                  </Accordion>
+                    </Accordion>
+                    <Accordion
+                      expanded={expandedPanel === 'nip'}
+                      onChange={togglePanel('nip')}
+                      disableGutters
+                      elevation={0}
+                    >
+                      <AccordionSummary
+                        id="nip-accordion-header"
+                        aria-controls="nip-accordion-content"
+                        expandIcon={<ExpandMoreRoundedIcon />}
+                      >
+                        <Box>
+                          <Typography variant="h6">NIP</Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            Syntetyczny polski numer identyfikacji podatkowej
+                          </Typography>
+                        </Box>
+                      </AccordionSummary>
+                      <AccordionDetails>
+                        <Stack spacing={3}>
+                          <RecordCountField
+                            value={nipCount}
+                            onChange={setNipCount}
+                            valid={parsedNipCount !== null}
+                          />
+                          <Alert severity="info">
+                            Numery są syntetycznymi danymi testowymi i nie
+                            potwierdzają istnienia podmiotu.
+                          </Alert>
+                          <Button
+                            variant="contained"
+                            size="large"
+                            startIcon={<AutoAwesomeRoundedIcon />}
+                            disabled={parsedNipCount === null}
+                            onClick={() =>
+                              handleGenerate(parsedNipCount, generateNip)
+                            }
+                          >
+                            Generuj
+                          </Button>
+                        </Stack>
+                      </AccordionDetails>
+                    </Accordion>
+                  </Stack>
                 )}
               </Box>
 
@@ -328,9 +376,9 @@ function App() {
                           Syntetyczny polski numer rachunku bankowego
                         </Typography>
                       </Box>
-                    </AccordionSummary>
-                    <AccordionDetails>
-                      <Stack spacing={3}>
+                      </AccordionSummary>
+                      <AccordionDetails>
+                        <Stack spacing={3}>
                         <RecordCountField
                           value={bankAccountCount}
                           onChange={setBankAccountCount}
@@ -379,9 +427,9 @@ function App() {
                         >
                           Generuj
                         </Button>
-                      </Stack>
-                    </AccordionDetails>
-                  </Accordion>
+                        </Stack>
+                      </AccordionDetails>
+                    </Accordion>
                 )}
               </Box>
 
