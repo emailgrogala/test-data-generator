@@ -1,11 +1,9 @@
 .app-shell {
   min-height: 100vh;
-  display: flex;
-  align-items: center;
-  padding: 64px 16px;
+  padding: 56px 16px;
   background:
-    radial-gradient(circle at 15% 10%, rgba(99, 102, 241, 0.16), transparent 30%),
-    radial-gradient(circle at 85% 85%, rgba(14, 165, 233, 0.13), transparent 28%),
+    radial-gradient(circle at 12% 8%, rgba(99, 102, 241, 0.16), transparent 30%),
+    radial-gradient(circle at 88% 75%, rgba(14, 165, 233, 0.13), transparent 28%),
     #f7f8fc;
 }
 
@@ -17,65 +15,125 @@
   text-align: center;
 }
 
-.generator-card {
+.generator-card,
+.results-panel {
   border: 1px solid rgba(15, 23, 42, 0.08);
   border-radius: 20px !important;
-  box-shadow: 0 24px 64px rgba(30, 41, 59, 0.12) !important;
+  box-shadow: 0 24px 64px rgba(30, 41, 59, 0.1) !important;
 }
 
-.generator-card .MuiCardContent-root {
-  padding: 32px;
+.generator-card .MuiTabs-root {
+  border-bottom: 1px solid #e2e8f0;
+  padding-inline: 16px;
 }
 
-.text-options {
-  padding: 20px;
-  border-radius: 12px;
+.generator-card .MuiTab-root {
+  min-height: 64px;
+  font-weight: 650;
+  text-transform: none;
+}
+
+.generator-content {
+  min-height: 240px;
+  padding: 28px !important;
+}
+
+.generator-content .MuiAccordion-root {
+  border: 1px solid #e2e8f0;
+  border-radius: 14px !important;
+  overflow: hidden;
+}
+
+.generator-content .MuiAccordion-root::before {
+  display: none;
+}
+
+.generator-content .MuiAccordionSummary-root {
+  min-height: 76px;
+  padding-inline: 20px;
   background: #f8fafc;
 }
 
-.result-panel {
-  padding: 20px;
-  border: 1px solid #dbe3ef;
-  border-radius: 12px;
-  background: #f8fafc;
+.generator-content .MuiAccordionDetails-root {
+  padding: 24px;
 }
 
-.result-panel .MuiStack-root {
-  justify-content: space-between;
+.date-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
 }
 
-.result-value,
+.results-panel {
+  padding: 24px;
+}
+
 .result-placeholder {
-  min-width: 0;
-  overflow-wrap: anywhere;
+  margin-top: 24px !important;
+  color: #64748b;
+}
+
+.results-list {
+  max-height: 420px;
+  margin: 24px 0 0;
+  padding: 0;
+  overflow-y: auto;
+  list-style: none;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+}
+
+.result-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 16px;
+}
+
+.result-row + .result-row {
+  border-top: 1px solid #e2e8f0;
 }
 
 .result-value {
+  min-width: 0;
+  overflow-wrap: anywhere;
   color: #0f172a;
   font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace !important;
-  font-size: 1.05rem !important;
+  font-size: 0.94rem !important;
   font-weight: 600 !important;
-}
-
-.result-placeholder {
-  color: #64748b;
 }
 
 @media (max-width: 600px) {
   .app-shell {
-    align-items: flex-start;
     padding: 36px 8px;
   }
 
   .page-heading .MuiTypography-h3 {
-    font-size: 2.25rem;
+    font-size: 2.2rem;
   }
 
-  .generator-card .MuiCardContent-root {
-    padding: 24px 20px;
+  .generator-card .MuiTabs-root {
+    padding-inline: 4px;
   }
 
-  .result-panel .MuiStack-root {
+  .generator-content {
+    padding: 16px !important;
+  }
+
+  .generator-content .MuiAccordionDetails-root {
+    padding: 20px 16px;
+  }
+
+  .date-fields {
+    grid-template-columns: 1fr;
+  }
+
+  .results-panel {
+    padding: 20px 16px;
+  }
+
+  .results-panel > .MuiStack-root:first-child {
     align-items: stretch;
     flex-direction: column;
   }
