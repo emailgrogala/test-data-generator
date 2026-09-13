@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import type { SyntheticEvent } from 'react'
 import AutoAwesomeRoundedIcon from '@mui/icons-material/AutoAwesomeRounded'
 import ExpandMoreRoundedIcon from '@mui/icons-material/ExpandMoreRounded'
@@ -33,7 +33,11 @@ import {
   MAX_PESEL_DATE,
   MIN_PESEL_DATE,
 } from './generators/pesel'
-import type { PeselGender, PeselOptions } from './generators/pesel'
+import type {
+  PeselGender,
+  PeselOptions,
+  PeselValidationErrorCode,
+} from './generators/pesel'
 import {
   generateRandomText,
   MAX_RANDOM_TEXT_LENGTH,
@@ -54,6 +58,19 @@ const defaultPanelByCategory: Record<Category, GeneratorPanel | false> = {
   finance: false,
   text: 'text',
   technical: 'uuid',
+}
+
+const peselErrorMessages: Record<PeselValidationErrorCode, string> = {
+  'invalid-date': 'Podaj poprawne daty.',
+  'date-out-of-range': `Daty muszą mieścić się w zakresie od ${MIN_PESEL_DATE} do ${MAX_PESEL_DATE}.`,
+  'reversed-date-range': 'Data od nie może być późniejsza niż data do.',
+}
+
+function getTabA11yProps(category: Category) {
+  return {
+    id: `${category}-tab`,
+    'aria-controls': `${category}-tabpanel`,
+  }
 }
 
 function parseRecordCount(value: string): number | null {
@@ -90,6 +107,9 @@ function App() {
     parsedTextLength <= MAX_RANDOM_TEXT_LENGTH
   const peselOptions: PeselOptions = { dateFrom, dateTo, gender }
   const peselOptionsError = getPeselOptionsError(peselOptions)
+  const peselOptionsErrorMessage = peselOptionsError
+    ? peselErrorMessages[peselOptionsError]
+    : null
 
   const handleCategoryChange = (_event: SyntheticEvent, value: Category) => {
     setCategory(value)
@@ -110,14 +130,14 @@ function App() {
     }
   }
 
-  const handleCopy = async (values: string[]) => {
+  const handleCopy = useCallback(async (values: string[]) => {
     try {
       await navigator.clipboard.writeText(values.join('\n'))
       setCopyStatus('success')
     } catch {
       setCopyStatus('error')
     }
-  }
+  }, [])
 
   return (
     <Box component="main" className="app-shell">
@@ -141,14 +161,31 @@ function App() {
               scrollButtons="auto"
               aria-label="Kategorie generatorów"
             >
-              <Tab value="personal" label="Dane osobowe" />
-              <Tab value="finance" label="Finanse" />
-              <Tab value="text" label="Tekst" />
-              <Tab value="technical" label="Techniczne" />
+              <Tab
+                value="personal"
+                label="Dane osobowe"
+                {...getTabA11yProps('personal')}
+              />
+              <Tab
+                value="finance"
+                label="Finanse"
+                {...getTabA11yProps('finance')}
+              />
+              <Tab value="text" label="Tekst" {...getTabA11yProps('text')} />
+              <Tab
+                value="technical"
+                label="Techniczne"
+                {...getTabA11yProps('technical')}
+              />
             </Tabs>
 
             <CardContent className="generator-content">
-              <Box role="tabpanel" hidden={category !== 'personal'}>
+              <Box
+                id="personal-tabpanel"
+                role="tabpanel"
+                aria-labelledby="personal-tab"
+                hidden={category !== 'personal'}
+              >
                 {category === 'personal' && (
                   <Accordion
                     expanded={expandedPanel === 'pesel'}
@@ -156,7 +193,11 @@ function App() {
                     disableGutters
                     elevation={0}
                   >
-                    <AccordionSummary expandIcon={<ExpandMoreRoundedIcon />}>
+                    <AccordionSummary
+                      id="pesel-accordion-header"
+                      aria-controls="pesel-accordion-content"
+                      expandIcon={<ExpandMoreRoundedIcon />}
+                    >
                       <Box>
                         <Typography variant="h6">PESEL</Typography>
                         <Typography variant="body2" color="text.secondary">
@@ -203,8 +244,10 @@ function App() {
                             fullWidth
                           />
                         </Box>
-                        {peselOptionsError && (
-                          <Alert severity="error">{peselOptionsError}</Alert>
+                        {peselOptionsErrorMessage && (
+                          <Alert severity="error">
+                            {peselOptionsErrorMessage}
+                          </Alert>
                         )}
                         <FormControl>
                           <FormLabel id="pesel-gender-label">Płeć</FormLabel>
@@ -255,7 +298,12 @@ function App() {
                 )}
               </Box>
 
-              <Box role="tabpanel" hidden={category !== 'finance'}>
+              <Box
+                id="finance-tabpanel"
+                role="tabpanel"
+                aria-labelledby="finance-tab"
+                hidden={category !== 'finance'}
+              >
                 {category === 'finance' && (
                   <Alert severity="info">
                     Generatory finansowe zostaną dodane w kolejnych etapach.
@@ -263,7 +311,12 @@ function App() {
                 )}
               </Box>
 
-              <Box role="tabpanel" hidden={category !== 'text'}>
+              <Box
+                id="text-tabpanel"
+                role="tabpanel"
+                aria-labelledby="text-tab"
+                hidden={category !== 'text'}
+              >
                 {category === 'text' && (
                   <Accordion
                     expanded={expandedPanel === 'text'}
@@ -271,7 +324,11 @@ function App() {
                     disableGutters
                     elevation={0}
                   >
-                    <AccordionSummary expandIcon={<ExpandMoreRoundedIcon />}>
+                    <AccordionSummary
+                      id="text-accordion-header"
+                      aria-controls="text-accordion-content"
+                      expandIcon={<ExpandMoreRoundedIcon />}
+                    >
                       <Box>
                         <Typography variant="h6">Tekst losowy</Typography>
                         <Typography variant="body2" color="text.secondary">
@@ -359,7 +416,12 @@ function App() {
                 )}
               </Box>
 
-              <Box role="tabpanel" hidden={category !== 'technical'}>
+              <Box
+                id="technical-tabpanel"
+                role="tabpanel"
+                aria-labelledby="technical-tab"
+                hidden={category !== 'technical'}
+              >
                 {category === 'technical' && (
                   <Accordion
                     expanded={expandedPanel === 'uuid'}
@@ -367,7 +429,11 @@ function App() {
                     disableGutters
                     elevation={0}
                   >
-                    <AccordionSummary expandIcon={<ExpandMoreRoundedIcon />}>
+                    <AccordionSummary
+                      id="uuid-accordion-header"
+                      aria-controls="uuid-accordion-content"
+                      expandIcon={<ExpandMoreRoundedIcon />}
+                    >
                       <Box>
                         <Typography variant="h6">UUID v4</Typography>
                         <Typography variant="body2" color="text.secondary">

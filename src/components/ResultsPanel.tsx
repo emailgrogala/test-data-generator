@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import ContentCopyRoundedIcon from '@mui/icons-material/ContentCopyRounded'
 import {
   Box,
@@ -13,9 +14,12 @@ interface ResultsPanelProps {
   onCopy: (values: string[]) => void
 }
 
-export function ResultsPanel({ values, onCopy }: ResultsPanelProps) {
+export const ResultsPanel = memo(function ResultsPanel({
+  values,
+  onCopy,
+}: ResultsPanelProps) {
   return (
-    <Paper elevation={0} className="results-panel" aria-live="polite">
+    <Paper elevation={0} className="results-panel">
       <Stack
         direction="row"
         spacing={2}
@@ -25,7 +29,12 @@ export function ResultsPanel({ values, onCopy }: ResultsPanelProps) {
           <Typography variant="overline" color="text.secondary">
             Wyniki
           </Typography>
-          <Typography component="h2" variant="h6">
+          <Typography
+            component="h2"
+            variant="h6"
+            aria-live="polite"
+            aria-atomic="true"
+          >
             Wygenerowano: {values.length}
           </Typography>
         </Box>
@@ -63,4 +72,4 @@ export function ResultsPanel({ values, onCopy }: ResultsPanelProps) {
       )}
     </Paper>
   )
-}
+})
