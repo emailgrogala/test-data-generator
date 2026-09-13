@@ -27,6 +27,8 @@ import {
 } from '@mui/material'
 import { RecordCountField } from './components/RecordCountField'
 import { ResultsPanel } from './components/ResultsPanel'
+import { generateBankAccount } from './generators/bankAccount'
+import type { BankAccountFormat } from './generators/bankAccount'
 import {
   generatePesel,
   getPeselOptionsError,
@@ -51,11 +53,11 @@ import { generateUuid } from './generators/uuid'
 import './App.css'
 
 type Category = 'personal' | 'finance' | 'text' | 'technical'
-type GeneratorPanel = 'pesel' | 'text' | 'uuid'
+type GeneratorPanel = 'pesel' | 'bank-account' | 'text' | 'uuid'
 
 const defaultPanelByCategory: Record<Category, GeneratorPanel | false> = {
   personal: 'pesel',
-  finance: false,
+  finance: 'bank-account',
   text: 'text',
   technical: 'uuid',
 }
@@ -85,11 +87,14 @@ function App() {
   const [expandedPanel, setExpandedPanel] =
     useState<GeneratorPanel | false>('pesel')
   const [peselCount, setPeselCount] = useState('1')
+  const [bankAccountCount, setBankAccountCount] = useState('1')
   const [uuidCount, setUuidCount] = useState('1')
   const [textCount, setTextCount] = useState('1')
   const [dateFrom, setDateFrom] = useState('1990-01-01')
   const [dateTo, setDateTo] = useState('2009-12-31')
   const [gender, setGender] = useState<PeselGender>('any')
+  const [bankAccountFormat, setBankAccountFormat] =
+    useState<BankAccountFormat>('nrb')
   const [textLength, setTextLength] = useState('24')
   const [characterSet, setCharacterSet] =
     useState<CharacterSet>('alphanumeric')
@@ -97,6 +102,7 @@ function App() {
   const [copyStatus, setCopyStatus] = useState<'success' | 'error' | null>(null)
 
   const parsedPeselCount = parseRecordCount(peselCount)
+  const parsedBankAccountCount = parseRecordCount(bankAccountCount)
   const parsedUuidCount = parseRecordCount(uuidCount)
   const parsedTextCount = parseRecordCount(textCount)
   const parsedTextLength = Number(textLength)
@@ -305,9 +311,77 @@ function App() {
                 hidden={category !== 'finance'}
               >
                 {category === 'finance' && (
-                  <Alert severity="info">
-                    Generatory finansowe zostaną dodane w kolejnych etapach.
-                  </Alert>
+                  <Accordion
+                    expanded={expandedPanel === 'bank-account'}
+                    onChange={togglePanel('bank-account')}
+                    disableGutters
+                    elevation={0}
+                  >
+                    <AccordionSummary
+                      id="bank-account-accordion-header"
+                      aria-controls="bank-account-accordion-content"
+                      expandIcon={<ExpandMoreRoundedIcon />}
+                    >
+                      <Box>
+                        <Typography variant="h6">NRB / IBAN</Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          Syntetyczny polski numer rachunku bankowego
+                        </Typography>
+                      </Box>
+                    </AccordionSummary>
+                    <AccordionDetails>
+                      <Stack spacing={3}>
+                        <RecordCountField
+                          value={bankAccountCount}
+                          onChange={setBankAccountCount}
+                          valid={parsedBankAccountCount !== null}
+                        />
+                        <FormControl>
+                          <FormLabel id="bank-account-format-label">
+                            Format
+                          </FormLabel>
+                          <RadioGroup
+                            row
+                            aria-labelledby="bank-account-format-label"
+                            value={bankAccountFormat}
+                            onChange={(event) =>
+                              setBankAccountFormat(
+                                event.target.value as BankAccountFormat,
+                              )
+                            }
+                          >
+                            <FormControlLabel
+                              value="nrb"
+                              control={<Radio />}
+                              label="NRB"
+                            />
+                            <FormControlLabel
+                              value="iban"
+                              control={<Radio />}
+                              label="IBAN"
+                            />
+                          </RadioGroup>
+                        </FormControl>
+                        <Alert severity="info">
+                          Numery są syntetycznymi danymi testowymi i nie
+                          potwierdzają istnienia rachunku.
+                        </Alert>
+                        <Button
+                          variant="contained"
+                          size="large"
+                          startIcon={<AutoAwesomeRoundedIcon />}
+                          disabled={parsedBankAccountCount === null}
+                          onClick={() =>
+                            handleGenerate(parsedBankAccountCount, () =>
+                              generateBankAccount(bankAccountFormat),
+                            )
+                          }
+                        >
+                          Generuj
+                        </Button>
+                      </Stack>
+                    </AccordionDetails>
+                  </Accordion>
                 )}
               </Box>
 
