@@ -147,39 +147,23 @@ Domyślnie:
 
 - generator PESEL powinien być pierwszym widocznym generatorem
 
-### NRB / IBAN
+### NIP
 
-W bieżącym etapie należy dodać generator polskiego numeru rachunku bankowego.
+W bieżącym etapie należy dodać generator polskiego numeru NIP.
 
 Generator powinien być dostępny w zakładce:
 
-- Finanse
+- Dane osobowe
 
-Panel generatora powinien umożliwiać wybór formatu:
+lub w innej istniejącej kategorii, jeśli obecny układ projektu wyraźnie wskazuje lepsze miejsce.
 
-- NRB
-- IBAN
+Generowany NIP powinien:
 
-#### NRB
-
-Generowany NRB powinien:
-
-- mieć dokładnie 26 cyfr
-- zawierać poprawne cyfry kontrolne
-- przechodzić walidację zgodną z algorytmem modulo 97
+- mieć dokładnie 10 cyfr
+- zawierać wyłącznie cyfry
+- mieć poprawną cyfrę kontrolną
+- przechodzić niezależną walidację NIP
 - być generowany jako syntetyczny numer testowy
-
-#### IBAN
-
-Generowany IBAN powinien:
-
-- używać kodu kraju `PL`
-- rozpoczynać się od prefiksu `PL`
-- zawierać poprawny polski numer rachunku
-- przechodzić standardową walidację IBAN modulo 97
-- być prezentowany bez spacji jako wartość bazowa
-
-#### Wspólne wymagania NRB / IBAN
 
 Generator powinien obsługiwać:
 
@@ -190,7 +174,7 @@ Generator powinien obsługiwać:
 - kopiowanie pojedynczej wartości
 - kopiowanie wszystkich wartości
 
-Logika generowania i walidacji NRB / IBAN powinna być niezależna od UI.
+Logika generowania i walidacji NIP powinna być niezależna od UI.
 
 Jeżeli implementowany jest walidator, powinien być możliwy do użycia niezależnie od komponentów React.
 
@@ -198,12 +182,49 @@ Generowane numery są wyłącznie syntetycznymi danymi testowymi.
 
 Nie należy:
 
-- deklarować, że wygenerowany numer należy do rzeczywistego klienta
-- deklarować, że numer odpowiada rzeczywistemu aktywnemu rachunkowi
-- dodawać rzeczywistych danych klientów
-- dodawać SWIFT / BIC
-- dodawać danych kart płatniczych
-- implementować wyszukiwania banku na podstawie numeru rachunku w tym etapie
+- deklarować, że wygenerowany NIP należy do rzeczywistego podmiotu
+- wyszukiwać danych firm na podstawie NIP
+- pobierać danych z zewnętrznych rejestrów
+- dodawać REGON w tym samym etapie
+
+### NRB / IBAN
+
+Generator polskiego numeru rachunku bankowego został zrealizowany.
+
+Obsługiwane formaty:
+
+- NRB
+- IBAN
+
+#### NRB
+
+Generowany NRB:
+
+- ma dokładnie 26 cyfr
+- zawiera poprawne cyfry kontrolne
+- przechodzi walidację zgodną z algorytmem modulo 97
+- jest generowany jako syntetyczny numer testowy
+
+#### IBAN
+
+Generowany IBAN:
+
+- używa kodu kraju `PL`
+- rozpoczyna się od prefiksu `PL`
+- zawiera poprawny polski numer rachunku
+- przechodzi standardową walidację IBAN modulo 97
+- jest prezentowany bez spacji jako wartość bazowa
+
+#### Wspólne zachowanie NRB / IBAN
+
+Generator obsługuje:
+
+- liczbę rekordów od 1 do 1000
+- wartość domyślną: 1
+- wspólny mechanizm walidacji liczby rekordów
+- wspólny panel wyników
+- kopiowanie pojedynczej wartości
+- kopiowanie wszystkich wartości
 
 ### UUID
 
@@ -245,6 +266,7 @@ Przykład:
 src/
   generators/
     pesel.ts
+    nip.ts
     bankAccount.ts
     uuid.ts
     text.ts
