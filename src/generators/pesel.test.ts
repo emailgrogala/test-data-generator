@@ -3,8 +3,7 @@ import {
   calculatePeselChecksum,
   generatePesel,
   getPeselOptionsError,
-  MAX_PESEL_DATE,
-  MIN_PESEL_DATE,
+  PeselValidationError,
 } from './pesel'
 import type { PeselOptions } from './pesel'
 import { generateRecords } from './records'
@@ -113,11 +112,15 @@ describe('generatePesel', () => {
     })
 
     expect(getPeselOptionsError(invalidOptions)).toBe(
-      'Start date cannot be later than end date',
+      'reversed-date-range',
     )
-    expect(() => generatePesel(invalidOptions)).toThrow(
-      'Start date cannot be later than end date',
-    )
+    expect(() => generatePesel(invalidOptions)).toThrow(PeselValidationError)
+
+    try {
+      generatePesel(invalidOptions)
+    } catch (error) {
+      expect(error).toMatchObject({ code: 'reversed-date-range' })
+    }
   })
 
   it.each([
@@ -128,13 +131,13 @@ describe('generatePesel', () => {
   ])('rejects dates outside the PESEL range', (dateFrom, dateTo) => {
     expect(
       getPeselOptionsError(options({ dateFrom, dateTo })),
-    ).toBe(`Dates must be between ${MIN_PESEL_DATE} and ${MAX_PESEL_DATE}`)
+    ).toBe('date-out-of-range')
   })
 
   it('rejects malformed dates and checksum input', () => {
     expect(
       getPeselOptionsError(options({ dateFrom: '2024-02-30' })),
-    ).toBe('Provide valid dates')
+    ).toBe('invalid-date')
     expect(() => calculatePeselChecksum('123')).toThrow()
   })
 })

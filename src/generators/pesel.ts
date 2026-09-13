@@ -5,6 +5,20 @@ export const MIN_PESEL_DATE = '1800-01-01'
 export const MAX_PESEL_DATE = '2299-12-31'
 
 export type PeselGender = 'any' | 'female' | 'male'
+export type PeselValidationErrorCode =
+  | 'invalid-date'
+  | 'date-out-of-range'
+  | 'reversed-date-range'
+
+export class PeselValidationError extends Error {
+  readonly code: PeselValidationErrorCode
+
+  constructor(code: PeselValidationErrorCode) {
+    super(code)
+    this.name = 'PeselValidationError'
+    this.code = code
+  }
+}
 
 export interface PeselOptions {
   dateFrom: string
@@ -46,14 +60,16 @@ function parseIsoDate(value: string): Date | null {
   return date
 }
 
-export function getPeselOptionsError(options: PeselOptions): string | null {
+export function getPeselOptionsError(
+  options: PeselOptions,
+): PeselValidationErrorCode | null {
   const dateFrom = parseIsoDate(options.dateFrom)
   const dateTo = parseIsoDate(options.dateTo)
   const minDate = parseIsoDate(MIN_PESEL_DATE)!
   const maxDate = parseIsoDate(MAX_PESEL_DATE)!
 
   if (!dateFrom || !dateTo) {
-    return 'Provide valid dates'
+    return 'invalid-date'
   }
 
   if (
@@ -62,11 +78,11 @@ export function getPeselOptionsError(options: PeselOptions): string | null {
     dateTo < minDate ||
     dateTo > maxDate
   ) {
-    return `Dates must be between ${MIN_PESEL_DATE} and ${MAX_PESEL_DATE}`
+    return 'date-out-of-range'
   }
 
   if (dateFrom > dateTo) {
-    return 'Start date cannot be later than end date'
+    return 'reversed-date-range'
   }
 
   return null
@@ -121,7 +137,7 @@ export function generatePesel(
   const validationError = getPeselOptionsError(options)
 
   if (validationError) {
-    throw new Error(validationError)
+    throw new PeselValidationError(validationError)
   }
 
   const date = getRandomDate(
