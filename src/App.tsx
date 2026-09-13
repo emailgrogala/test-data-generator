@@ -25,6 +25,7 @@ import {
   TextField,
   Typography,
 } from '@mui/material'
+import { AboutProject } from './components/AboutProject'
 import { RecordCountField } from './components/RecordCountField'
 import { ResultsPanel } from './components/ResultsPanel'
 import { generateBankAccount } from './generators/bankAccount'
@@ -53,7 +54,7 @@ import {
 import { generateUuid } from './generators/uuid'
 import './App.css'
 
-type Category = 'personal' | 'finance' | 'text' | 'technical'
+type Category = 'personal' | 'finance' | 'text' | 'technical' | 'about'
 type GeneratorPanel = 'pesel' | 'nip' | 'bank-account' | 'text' | 'uuid'
 
 const defaultPanelByCategory: Record<Category, GeneratorPanel | false> = {
@@ -61,6 +62,7 @@ const defaultPanelByCategory: Record<Category, GeneratorPanel | false> = {
   finance: 'bank-account',
   text: 'text',
   technical: 'uuid',
+  about: false,
 }
 
 const peselErrorMessages: Record<PeselValidationErrorCode, string> = {
@@ -185,6 +187,12 @@ function App() {
                 value="technical"
                 label="Techniczne"
                 {...getTabA11yProps('technical')}
+              />
+              <Tab
+                className="about-tab"
+                value="about"
+                label="O projekcie"
+                {...getTabA11yProps('about')}
               />
             </Tabs>
 
@@ -586,10 +594,21 @@ function App() {
                   </Accordion>
                 )}
               </Box>
+
+              <Box
+                id="about-tabpanel"
+                role="tabpanel"
+                aria-labelledby="about-tab"
+                hidden={category !== 'about'}
+              >
+                {category === 'about' && <AboutProject />}
+              </Box>
             </CardContent>
           </Card>
 
-          <ResultsPanel values={results} onCopy={handleCopy} />
+          {category !== 'about' && (
+            <ResultsPanel values={results} onCopy={handleCopy} />
+          )}
 
           <Typography
             variant="body2"
